@@ -1,0 +1,22 @@
+# Build Results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+*.obj
+*.pdb
+*.ilk
+*.log
+*.exe
+*.dll
+
+# Visual Studio cache
+.vs/
