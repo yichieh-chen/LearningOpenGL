@@ -83,25 +83,37 @@ int main()
 	// 與 windowSizeCallback 的區別在這裡專注在可以繪圖的像素區塊大小
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	// 三角形 vertex data
-	float vectices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f
+	// Vertex data，四個頂點繪製兩個三角形
+	float vertices[] = {
+		0.5f, 0.5f, 0.0f,   // 右上角
+		0.5f, -0.5f, 0.0f,  // 右下角
+		-0.5f, -0.5f, 0.0f, // 左下角
+		-0.5f, 0.5f, 0.0f   // 左上角
 	};
 
-	// 建立一個 Vertex Buffer Object
-	unsigned int VBO;
+	unsigned int indices[] = {
+		0, 1, 2, //第一個三角形
+		3, 2, 0 // 第二個三角形
+	};
+
+	// 建立一個 Vertex Buffer Object 與 Element Buffer Object
+	unsigned int EBO, VBO;
+	glGenBuffers(1, &EBO);
 	glGenBuffers(1, &VBO);
 
-	//建立一個 VAO，用來記錄等一下對 VBO 的操作
+	//建立一個 VAO，用來記錄等一下對 EBO 的操作
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 
-	//綁定 VAO 後，開始綁定 VBO 並操作
+	//綁定 VAO 後，開始綁定 VBO 和 EBO 並操作
 	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vectices), vectices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
 
 	//建立一個 Vertex shader
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -140,7 +152,8 @@ int main()
 
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents(); // 檢查是否有觸發任何事件，呼叫 Callback

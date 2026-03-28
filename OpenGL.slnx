@@ -5,4 +5,8 @@
   </Configurations>
   <Project Path="00_Test/00_Test.vcxproj" Id="ceb4e1b4-7701-4bec-92d9-db439510f3c0" />
   <Project Path="01_HelloTriangle/01_HelloTriangle.vcxproj" Id="b40eb707-bfad-4a7b-abd0-4e8c6eb75c24" />
+  <Project Path="02_HelloTriangle (EBO ver.)/02_HelloTriangle (EBO ver.).vcxproj" Id="634d21bf-b007-4fb8-806c-009aea31e9ff" />
+  <Project Path="03_ShaderUniform/03_ShaderUniform.vcxproj" Id="f48827ed-84fb-47f6-a447-d092d8be76b2" />
+  <Project Path="04_ShaderClass/04_ShaderClass.vcxproj" Id="fc94a832-1d0d-4d14-b3b5-d5d603a4a3e2" />
+  <Project Path="05_Texture/05_Texture.vcxproj" Id="47e3fe6d-3864-455e-b745-99457cc997e2" />
 </Solution>

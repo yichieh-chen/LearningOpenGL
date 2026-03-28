@@ -6,17 +6,22 @@
 const char* vertexShaderSource =
 "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
+"layout (location = 1) in vec3 aColor;\n"
+"out vec3 ourColor;\n"
 "void main()\n"
 "{\n"
 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"	ourColor = aColor;\n"
 "}\0";
 
+//採用 Uniform 變數來控制 output Color
 const char* fragShaderSource =
 "#version 330 core\n"
 "out vec4 FragColor;\n"
+"in vec3 ourColor;\n"
 "void main()\n"
 "{\n"
-"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"	FragColor = vec4(ourColor, 1.0f);\n"
 "}\0";
 
 //callback function for adjusting viewport when resize the glfw window's width and height
@@ -83,11 +88,12 @@ int main()
 	// 與 windowSizeCallback 的區別在這裡專注在可以繪圖的像素區塊大小
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	// 三角形 vertex data
+	// 三角形 vertex data ( 有兩個 Vertex Attributes )
 	float vectices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f
+		// 位置					顏色
+		-0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
+		0.0f, 0.5f, 0.0f,    0.0f, 0.0f, 1.0f
 	};
 
 	// 建立一個 Vertex Buffer Object
@@ -127,9 +133,13 @@ int main()
 	glDeleteShader(fragmentShader);
 
 
-	//設定 Vertex Attribute 如何解釋 ( 會被記錄到 VAO )
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//設定 Vertex Attribute (位置屬性)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	//設定 Vertex Attribute (顏色屬性)
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -138,7 +148,13 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		//取得 Uniform 變數的 Location 之後，利用 timeValue 來改變顏色
 		glUseProgram(shaderProgram);
+		float timeValue = glfwGetTime();
+		float redValue = sin(timeValue) / 2.0f + 0.3f;
+		int ColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+		glUniform4f(ColorLocation, redValue, 0.0f, 0.0f, 0.0f); // 4f 表示 4 個 float
+
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 

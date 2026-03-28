@@ -1,23 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "Shader.h"
 #include <iostream>
 #include <string>
-
-const char* vertexShaderSource =
-"#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-
-const char* fragShaderSource =
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\0";
 
 //callback function for adjusting viewport when resize the glfw window's width and height
 // 這個 callback function 的參數是 GLFW 規定好的。發生狀態改變的時候，GLFW 會傳入該 window 的 height, width
@@ -30,29 +15,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
-	}
-}
-
-// 檢查是否編譯 shader 成功
-void CheckShaderCompile(unsigned int shader, std::string type) {
-	int success;
-	char infoLog[512];
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-	if (!success) {
-		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::" << type << "::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-}
-
-void CheckShaderLink(unsigned int program) {
-	int success;
-	char infoLog[512];
-	glGetShaderiv(program, GL_LINK_STATUS, &success);
-
-	if (!success) {
-		glGetProgramInfoLog(program, 512, NULL, infoLog);
-		std::cout << "ERROR::PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
 	}
 }
 
@@ -83,11 +45,12 @@ int main()
 	// 與 windowSizeCallback 的區別在這裡專注在可以繪圖的像素區塊大小
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	// 三角形 vertex data
+	// 三角形 vertex data ( 有兩個 Vertex Attributes )
 	float vectices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f
+		// 位置					顏色
+		-0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
+		0.0f, 0.5f, 0.0f,    0.0f, 0.0f, 1.0f
 	};
 
 	// 建立一個 Vertex Buffer Object
@@ -103,33 +66,17 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vectices), vectices, GL_STATIC_DRAW);
 
-	//建立一個 Vertex shader
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	CheckShaderCompile(vertexShader, "VERTEX");
-
-	//建立一個 Fragment shader
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	CheckShaderCompile(fragmentShader, "FRAGMENT");
-
-	//建立一個 shader Program，附加兩個 shader 後把他們 link 起來
-	unsigned int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	CheckShaderLink(shaderProgram);
-
-	// 刪除兩個 shader，釋放記憶體
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	// 建立 Shader
+	Shader myShader("shader.vert", "shader.frag");
 
 
-	//設定 Vertex Attribute 如何解釋 ( 會被記錄到 VAO )
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//設定 Vertex Attribute (位置屬性)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	//設定 Vertex Attribute (顏色屬性)
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -138,7 +85,8 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(shaderProgram);
+
+		myShader.useShader();
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
