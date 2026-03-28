@@ -1,26 +1,43 @@
-# LearnOpenGL Learning Notes
+# Learning OpenGL Notes
 
-這個專案是用來記錄我在學習 LearnOpenGL 過程中的練習與筆記。
+這個 repository 用來記錄我跟著 LearnOpenGL 練習的學習過程。
 
-## Project 目標
+## 專案目標
 
-- 跟著 LearnOpenGL 章節實作範例
-- 理解 OpenGL 基本概念（Shader、VAO/VBO、座標系統、貼圖等）
-- 累積可重複執行的練習程式
+- 依章節實作 LearnOpenGL 範例
+- 熟悉 OpenGL 核心概念（VAO / VBO / EBO、Shader、Texture）
+- 保存每一階段可執行的練習結果
 
-## 目前內容
+## 目前進度
 
-- `00_Test`：測試用程式
-- `01_HelloTriangle`：第一個三角形繪製範例
+- `00_Test`：環境與流程測試
+- `01_HelloTriangle`：繪製第一個三角形
+- `02_HelloTriangle (EBO ver.)`：使用 EBO 繪製矩形
+- `03_ShaderUniform`：練習 `uniform` 變數
+- `04_ShaderClass`：整理 Shader 載入與使用流程
+- `05_Texture`：貼圖載入與混合（`container.jpg` + `awesomeface.png`）
 
-## 開發環境
+## 使用技術
 
 - C++
-- OpenGL
+- OpenGL 3.3 Core
 - GLFW
 - GLAD
+- stb_image
 - Visual Studio（Windows）
 
-## 說明
+## 專案結構（摘要）
 
-此 repository 以學習與實作為主，程式碼會隨著學習進度持續更新。
+- `includes/`：共用 header（如 GLM）
+- `libs/`：第三方 library
+- `glfw/`、`glm/`：以 vendor 方式放入專案
+
+## 執行方式
+
+1. 使用 Visual Studio 開啟 solution（例如根目錄 solution 檔）
+2. 選擇想執行的章節專案（例如 `05_Texture`）
+3. Build 並執行
+
+## 備註
+
+本專案以學習紀錄為主，內容會隨著練習進度持續更新。
